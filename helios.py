@@ -6,6 +6,7 @@ import yaml
 import requests
 import xmltodict
 import re
+import sys
 
 from pprint import pprint
 
@@ -42,10 +43,18 @@ login = callWithPass(
 )
 
 def setSpeed(speed):
-    callWithPass(
-        url = 'http://{}/info.htm'.format(config["host"]),
-        data = 'v00102={}'.format(speed)
-    )
+    if speed == 'auto':
+        # auto: v00101 = 0
+        # manu: v00101 = 1
+        callWithPass(
+            url = 'http://{}/info.htm'.format(config["host"]),
+            data = 'v00101=0'
+        )
+    else:
+        callWithPass(
+            url = 'http://{}/info.htm'.format(config["host"]),
+            data = 'v00102={}&v00101=1'.format(int(speed))
+        )
 
 def getKeyNames():
     originalKeyNames = requests.get('http://{}/data/lab8_en.xml'.format(config["host"])).text
@@ -117,9 +126,33 @@ def temperatures():
 
     return temperatures
 
-def speed(value = None):
-    if value:
+def speed(value = -1):
+    if value == 'auto':
+        setSpeed('auto')
+    elif int(value) >= 0:
         setSpeed(int(value))
+    rawValues = getRawValues()
+
+    modeMap = {
+        0: 'auto',
+        1: 'manual'
+    }
+
+    return {
+        'mode': modeMap[int(rawValues["v00101"])],
+        'speed': int(rawValues["v00102"])
+    }
+
+if len(sys.argv) > 1:
+    FUNCTION_MAP = {
+        'speed' : speed,
+        'temperatures': temperatures,
+        'status': status
+    }
+
+    if len(sys.argv) > 2:
+        func = FUNCTION_MAP[sys.argv[1]]
+        pprint(func(sys.argv[2]))
     else:
-        rawValues = getRawValues()
-        return int(rawValues["v00102"])
+        func = FUNCTION_MAP[sys.argv[1]]
+        pprint(func())
