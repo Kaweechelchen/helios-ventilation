@@ -11,3 +11,7 @@ influx:
     pass: yourpasswordhere
     db: airsensors
     table: air
+
+override:
+    aboveTemp: 23
+    difference: 2

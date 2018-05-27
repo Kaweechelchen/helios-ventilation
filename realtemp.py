@@ -25,17 +25,17 @@ def temperatures():
         'outside': float(getTemperature(config["node"]["outside"]))
     }
 
-def getTemperatureDiff():
+def diff():
     realTemperatures = temperatures()
     return realTemperatures["inside"] - realTemperatures["outside"]
 
 def canCool():
-    return getTemperatureDiff() >= 0
+    return diff() >= 0
 
 if len(sys.argv) > 1:
     FUNCTION_MAP = {
         'canCool' : canCool,
-        'diff': getTemperatureDiff,
+        'diff': diff,
         'temperatures': temperatures
     }
 
