@@ -1,2 +1,13 @@
 host: 10.9.7.1
 password: yourpasswordhere
+
+node:
+    outside: outside
+    inside: inside
+
+influx:
+    host: influx.example.com
+    user: vent-automation
+    pass: yourpasswordhere
+    db: airsensors
+    table: air
