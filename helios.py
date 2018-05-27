@@ -87,7 +87,13 @@ def getRawValues():
     rawValues = {}
 
     for idx, id in enumerate(originalIds):
-        rawValues[id] = originalValues[idx]
+        try:
+            rawValues[id] = int(originalValues[idx])
+        except ValueError:
+            try:
+                rawValues[id] = float(originalValues[idx])
+            except ValueError:
+                rawValues[id] = originalValues[idx]
 
     return rawValues
 
@@ -99,13 +105,7 @@ def status():
 
     for key in keys:
         if key in rawValues:
-            try:
-                values[keys[key]] = int(rawValues[key])
-            except ValueError:
-                try:
-                    values[keys[key]] = float(rawValues[key])
-                except ValueError:
-                    values[keys[key]] = rawValues[key]
+            values[keys[key]] = rawValues[key]
         else:
             values[keys[key]] = None
 
