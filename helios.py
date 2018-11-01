@@ -7,6 +7,7 @@ import requests
 import xmltodict
 import re
 import sys
+import json
 
 from pprint import pprint
 
@@ -111,20 +112,24 @@ def status():
 
     return values
 
-def temperatures():
+def sensors():
     rawValues = getRawValues()
 
-    temperatures = {}
+    sensors = {}
 
-    temperatures["internal"] = {}
-    temperatures["external"] = {}
+    sensors["internal"] = {}
+    sensors["external"] = {}
+    sensors["internal"]['temperature'] = {}
+    sensors["internal"]['humidity'] = {}
+    sensors["external"]['temperature'] = {}
 
-    temperatures["internal"]["in"] = rawValues["v00105"]
-    temperatures["internal"]["out"] = rawValues["v00107"]
-    temperatures["external"]["in"] = rawValues["v00104"]
-    temperatures["external"]["out"] = rawValues["v00106"]
+    sensors["internal"]['temperature']["in"] = rawValues["v00105"]
+    sensors["internal"]['temperature']["out"] = rawValues["v00107"]
+    sensors["internal"]['humidity']["out"] = rawValues["v02136"]
+    sensors["external"]['temperature']["in"] = rawValues["v00104"]
+    sensors["external"]['temperature']["out"] = rawValues["v00106"]
 
-    return temperatures
+    return sensors
 
 def speed(value = -1):
     if value == 'auto':
@@ -146,13 +151,13 @@ def speed(value = -1):
 if len(sys.argv) > 1:
     FUNCTION_MAP = {
         'speed' : speed,
-        'temperatures': temperatures,
+        'sensors': sensors,
         'status': status
     }
 
     if len(sys.argv) > 2:
         func = FUNCTION_MAP[sys.argv[1]]
-        pprint(func(sys.argv[2]))
+        print(json.dumps(func(sys.argv[2])))
     else:
         func = FUNCTION_MAP[sys.argv[1]]
-        pprint(func())
+        print(json.dumps(func()))
