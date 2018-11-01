@@ -8,10 +8,14 @@ import xmltodict
 import re
 import sys
 import json
+import os
 
 from influxdb import InfluxDBClient
 
-with open("config.yml", 'r') as configfile:
+dirname = os.path.dirname(__file__)
+configFilePath = os.path.join(dirname, 'config.yml')
+
+with open(configFilePath, 'r') as configfile:
     try:
         config = yaml.load(configfile)
     except yaml.YAMLError as exc:
