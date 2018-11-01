@@ -156,6 +156,7 @@ def logStatus():
     influx = InfluxDBClient(config["influx"]["host"], 8086, config["influx"]["user"], config["influx"]["pass"], config["influx"]["db"])
 
     sensorData = sensors()
+    rawValues = getRawValues()
 
     json_body = [
         {
@@ -165,18 +166,15 @@ def logStatus():
                 "temperature_external_out": sensorData['external']['temperature']['out'],
                 "temperature_internal_in":  sensorData['internal']['temperature']['in'],
                 "temperature_internal_out": sensorData['internal']['temperature']['out'],
-                "humidity_internal_out":    sensorData['internal']['humidity']['out']
+                "humidity_internal_out":    sensorData['internal']['humidity']['out'],
+                "speed":                    int(rawValues["v00102"]),
+                "manualMode":               int(rawValues["v00101"])
             }
         }
     ]
 
     influx.write_points(json_body)
-
-    return json.dumps(json_body)
-
-    #result = influx.write_points(json.dumps(sensors()))
-
-    #return result
+    return
 
 if len(sys.argv) > 1:
     FUNCTION_MAP = {
