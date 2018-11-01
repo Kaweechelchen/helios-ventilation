@@ -9,7 +9,7 @@ import re
 import sys
 import json
 
-from pprint import pprint
+from influxdb import InfluxDBClient
 
 with open("config.yml", 'r') as configfile:
     try:
@@ -148,11 +148,38 @@ def speed(value = -1):
         'speed': int(rawValues["v00102"])
     }
 
+def logStatus():
+    influx = InfluxDBClient(config["influx"]["host"], 8086, config["influx"]["user"], config["influx"]["pass"], config["influx"]["db"])
+
+    sensorData = sensors()
+
+    json_body = [
+        {
+            "measurement": "ventilation",
+            "fields": {
+                "temperature_external_in":  sensorData['external']['temperature']['in'],
+                "temperature_external_out": sensorData['external']['temperature']['out'],
+                "temperature_internal_in":  sensorData['internal']['temperature']['in'],
+                "temperature_internal_out": sensorData['internal']['temperature']['out'],
+                "humidity_internal_out":    sensorData['internal']['humidity']['out']
+            }
+        }
+    ]
+
+    influx.write_points(json_body)
+
+    return json.dumps(json_body)
+
+    #result = influx.write_points(json.dumps(sensors()))
+
+    #return result
+
 if len(sys.argv) > 1:
     FUNCTION_MAP = {
         'speed' : speed,
         'sensors': sensors,
-        'status': status
+        'status': status,
+        'logStatus': logStatus
     }
 
     if len(sys.argv) > 2:
@@ -160,4 +187,5 @@ if len(sys.argv) > 1:
         print(json.dumps(func(sys.argv[2])))
     else:
         func = FUNCTION_MAP[sys.argv[1]]
-        print(json.dumps(func()))
+        #print(json.dumps(func()))
+        print(func())

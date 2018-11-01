@@ -15,7 +15,7 @@ influx = InfluxDBClient(config["influx"]["host"], 8086, config["influx"]["user"]
 
 def getTemperature(node):
     result = influx.query(
-        "SELECT temperature FROM {} WHERE (\"node\" = '{}') ORDER BY time DESC LIMIT 1;".format(config["influx"]["table"], node)
+        "SELECT temperature FROM {} WHERE (\"node\" = '{}') ORDER BY time DESC LIMIT 1;".format(config["influx"]["table-other"], node)
     )
     return result.raw["series"][0]["values"][0][1]
 
